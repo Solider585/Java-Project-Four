@@ -1,0 +1,92 @@
+// Homework 5. Lambda Expressions.
+
+package functors;
+
+import java.util.LinkedList;
+import java.util.Arrays;
+
+// b)
+class TimesTwoFun implements Functor<Integer, Integer> {
+	@Override
+	public Integer apply(Integer param) {
+		return param * 2;
+		// autoboxing: the compiler will generate
+		//    return new Integer(param.intValue() * 2);
+	}
+}
+
+
+// c)
+class Summer implements Functor2<Integer,Integer,Integer> {
+	@Override
+	public Integer apply(Integer t1, Integer t2) {
+	    return  t1 + t2; // same as new Integer(t1.intValue() + t2.intValue());  // t1 + t2;    
+	}
+}
+
+
+
+public class MyList <E> extends LinkedList <E> {
+	private static final long serialVersionUID = 1L;
+
+	public MyList() {
+		super();
+	}
+
+    // b)
+	public <R> MyList <R> map(Functor <? extends R,? super E> func) {
+		MyList <R> nl = new MyList<R>();
+		for (E e: this) {
+			nl.add(func.apply(e));
+		}
+		return nl;
+	}
+    // c)
+	public E reduce(Functor2 <E,E,E> func, E initval) {
+		E val = initval;
+		for (E e:this) {
+			val = func.apply(val, e);
+		}
+		return val;
+	}
+
+
+    private static void print(String s) {
+	System.out.println(s);
+    }
+
+
+    public static void main(String[] args) {
+
+	// b)
+	
+	TimesTwoFun times2func = new TimesTwoFun();
+	MyList<Integer> intls = new MyList<>();
+	intls.addAll(Arrays.asList(-2,1,0,4));    // asList() is a 'vararg' function
+		
+	MyList <Integer> int2ls = intls.map(times2func);		
+	print("7.b) apply Times2Fun to list " + intls + " returns " + int2ls);
+
+
+	// now with lambda expression:
+	MyList <Integer> int2ls2 = intls.map(x -> 2 * x);
+	print("7.b) map 2*x with lambda expression " + intls + " returns " + int2ls2);
+
+
+	// c)
+	Summer summer = new Summer();
+
+	MyList<Integer> ints = new MyList<>();
+	ints.addAll(Arrays.asList(3, -1, 1, 4));    // asList() is a 'vararg' function
+
+	Integer sumOfAll = ints.reduce(summer, 0);
+	print("7.c) reduce list " + ints + " with " + summer.getClass() + " = " + sumOfAll);
+
+	// now with lambda expression:
+	Integer sumOfAll2 = ints.reduce((x,y) -> x + y, 0);
+	print("7.c) reduce list " + ints + " with lambda = " + sumOfAll2);
+
+    }
+}
+
+
